@@ -1,0 +1,9 @@
+rule HostOutOfDiskSpace "Check for disk space alert" salience 10 {
+  when
+    Fact.Status == "firing" && Fact.Labels["alertname"] == "HostOutOfDiskSpace"
+  then
+    Fact.Playbook = "check_filesystem.yml";
+    Fact.InventoryFile = "localhost.yml";
+    // Fact.LimitHost = Fact.GetLimitHost();
+    Retract("HostOutOfDiskSpace");
+}

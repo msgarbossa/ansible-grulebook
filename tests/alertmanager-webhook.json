@@ -1,0 +1,54 @@
+{
+    "receiver": "EDA",
+    "status": "firing",
+    "alerts": [
+      {
+        "status": "firing",
+        "labels": {
+          "alertname": "HostOutOfDiskSpace",
+          "app": "demo1",
+          "device": "/dev/mapper/app_vg-var_lib_docker_lv",
+          "env": "lab",
+          "fstype": "xfs",
+          "instance": "host1.acme.com:9100",
+          "job": "node",
+          "mountpoint": "/var/lib/docker",
+          "severity": "warning"
+        },
+        "annotations": {
+          "description": "Disk is almost full (< 40% left)\n  VALUE = 21.555829757766674\n  LABELS = map[device:/dev/mapper/app_vg-var_lib_docker_lv fstype:xfs instance:host1.acme.com:9100 job:node mountpoint:/var/lib/docker]",
+          "summary": "Host out of disk space (instance host1.acme.com:9100)"
+        },
+        "startsAt": "2024-02-17T07:29:28Z",
+        "endsAt": "0001-01-01T00:00:00Z",
+        "generatorURL": "http://prometheus:9090/graph?g0.expr=%28node_filesystem_avail_bytes+%2A+100%29+%2F+node_filesystem_size_bytes+%3C+40+and+on+%28instance%2C+device%2C+mountpoint%29+node_filesystem_readonly+%3D%3D+0&g0.tab=1",
+        "fingerprint": "c442f235db1da98d"
+      },
+      {
+        "status": "firing",
+        "labels": {
+          "alertname": "HostOutOfDiskSpace",
+          "app": "demo1",
+          "device": "/dev/mapper/rootvg-optlv",
+          "env": "lab",
+          "fstype": "xfs",
+          "instance": "host1.acme.com:9100",
+          "job": "node",
+          "mountpoint": "/opt",
+          "severity": "testing"
+        },
+        "annotations": {
+          "description": "Disk is almost full (< 40% left)\n  VALUE = 26.75091235279686\n  LABELS = map[device:/dev/mapper/rootvg-optlv fstype:xfs instance:host1.acme.com:9100 job:node mountpoint:/opt]",
+          "summary": "Host out of disk space (instance host1.acme.com:9100)"
+        },
+        "startsAt": "2023-12-20T23:15:17.794Z",
+        "endsAt": "0001-01-01T00:00:00Z",
+        "generatorURL": "http://prometheus:9090/graph?g0.expr=%28node_filesystem_avail_bytes+%2A+100%29+%2F+node_filesystem_size_bytes+%3C+40+and+on+%28instance%2C+device%2C+mountpoint%29+node_filesystem_readonly+%3D%3D+0&g0.tab=1",
+        "fingerprint": "53b86252ce890b7e"
+      }
+  ],
+    "externalURL": "http://alertmanager:9093",
+    "version": "4",
+    "groupKey": "{}/{severity=\"testing\"}:{alertname=\"HostOutOfDiskSpace\", env=\"lab\", job=\"node\"}",
+    "truncatedAlerts": 0
+  }

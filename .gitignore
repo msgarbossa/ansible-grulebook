@@ -1,0 +1,5 @@
+out/
+archive/
+.ssh/
+test/salus-report*
+envs.local

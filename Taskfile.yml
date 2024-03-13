@@ -1,0 +1,78 @@
+---
+
+# Taskfile is an alternative to Makefile and is written in go:
+# https://taskfile.dev/
+
+version: "3"  # Taskfile version, not application version: https://taskfile.dev/taskfile-versions/
+
+vars:
+    BINARY: ansible-grulebook
+    BUILD_DATE: {sh: date -u +"%Y%m%d"}
+    BUILD_VERSION: {sh: git describe --tags}
+    LDFLAGS: "-ldflags \"-X main.BuildVersion={{.BUILD_VERSION}} -X main.BuildDate={{.BUILD_DATE}}\""
+    OUT: out
+    CONTAINER_IMAGE: "{{.BINARY}}"
+
+tasks:
+    clean:
+        desc: Cleanup build and test directories
+        cmds:
+            - rm -rf {{.OUT}}
+            - mkdir -p {{.OUT}}
+            - GOOS=${GOOS} GOARCH=${GOARCH} CGO_ENABLED=0 go clean -modcache
+
+    go_sec:
+        desc: Security scanning of code using Salus, which runs Gosec, GoOSV, and other tools
+        cmds:
+            - docker run --rm -t -v $(pwd):/home/repo coinbase/salus:latest -c file://tests/salus.yaml
+
+    docker_build:
+        desc: Build the container image
+        deps: [go_build_linux]
+        cmds:
+            - docker build -t {{.CONTAINER_IMAGE}}:latest -f Dockerfile .
+
+    go_build_linux:
+        desc: Build the go binary for Linux
+        # deps: [clean]
+        env:
+            GOOS: linux
+            GOARCH: amd64
+        cmds:
+            - GOOS=linux CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -buildvcs=false {{.LDFLAGS}} -o ./{{.OUT}}/{{.BINARY}}-{{.BUILD_VERSION}}-${GOOS}-${GOARCH} .
+
+    dep:
+        desc: Update dependencies
+        env:
+            GOOS: linux
+            GOARCH: amd64
+        cmds:
+            - GOOS=linux CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go mod tidy
+            - GOOS=linux CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go mod download
+
+    vendor:
+        desc: Vendor go modules in ./vendor directory
+        env:
+            GOOS: linux
+            GOARCH: amd64
+        cmds:
+            - rm -rf ./vendor
+            - GOOS=linux CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go mod vendor
+
+    fmt:
+        desc: Auto-correct lint issues
+        env:
+            GOFMT_FILES: {sh: find . -name '*.go'}
+        cmds:
+            - gofmt -w ${GOFMT_FILES}
+
+    test:
+        desc: Run go test
+        cmds:
+            - go test ./... -v -race
+
+    coverage:
+        desc: Run code coverage test
+        cmds:
+            - go test ./... -v -race -covermode=atomic
+

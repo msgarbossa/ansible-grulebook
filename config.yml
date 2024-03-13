@@ -1,0 +1,8 @@
+---
+
+sources:
+  - name: Listen for Alertmanager alerts
+    type: alertmanager
+    host: 0.0.0.0
+    port: 5001
+
